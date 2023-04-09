@@ -1,4 +1,5 @@
 %% initiate values
+tic
 clear
 map = LoadMap();
 map= flip(map ,1); 
@@ -29,14 +30,14 @@ while(~is_end)
     if ((1 < q_new(2)) & (q_new(2)< size(map,1))) & ((1 < q_new(1))& (q_new < size(map,2)))
         if map(round(q_new(2)),round(q_new(1))) == 0
             V = [V; [q_new(1), q_new(2)]];
-            E = [E; [q_near q_new]];
+            E = [E; [find(V==q_near,1) size(V,1)]];
         end
     end
     p1 = plot(q_rand(1),q_rand(2),'r.','MarkerSize',15);
     plot(V(:,1),V(:,2),'g.','MarkerSize',15);
     p2 = plot(q_new(1),q_new(2),'b.','MarkerSize',15);
 
-    plot([E(end,1),E(end,3)],[E(end,2),E(end,4)],'g','MarkerSize',15);
+    plot([V(E(end,1),1),V(E(end,2),1)],[V(E(end,1),2),V(E(end,2),2)],'g','MarkerSize',15);
 
     pause(0.0001)
     delete(p1)
@@ -46,6 +47,7 @@ while(~is_end)
     end
 end
 
+toc
 
 
 
@@ -74,3 +76,4 @@ end
 function rand_num = rand_btw(a,b)
     rand_num = a + (b-a)*rand();
 end
+
