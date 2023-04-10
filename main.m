@@ -1,6 +1,6 @@
 %% initiate values
 conf_init = [3 15 0];
-conf_goal = [23 1 0];
+conf_goal = [21 6 0];
 k_att = 0.7;       % attractive field gain
 k_rep = 9;       % repulsive field gain
 DoI = 2.1;        % Maximum distance of infulence
@@ -15,7 +15,7 @@ obs = [col, row];
 %% construct Attractive Field
 goal_dist = zeros(size(map));
 goal_dist(conf_goal(2), conf_goal(1)) = 1;
-goal_dist(10, 23) = 1;
+goal_dist(10, 21) = 1;
 goal_dist = bwdist(goal_dist);
 potential_att = k_att*(goal_dist);
 
@@ -66,6 +66,8 @@ subplot(3,3,[2,3,5,6,8,9]);
 
 imshow(flip(disp_map),'InitialMagnification','fit')
 pause(1)
+
+path = [];
 
 while(~is_end)
 
@@ -151,9 +153,14 @@ while(~is_end)
 
     pause(0.1)
 
+    path = [path; conf_cur(1:2)];
+
     if conf_cur(1:2) == conf_goal(1:2)
         is_end = true;
     end
 
 end
 
+
+hold on
+plot(path(:,1),16-path(:,2),'ro','MarkerSize',10);
