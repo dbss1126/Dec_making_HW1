@@ -11,7 +11,7 @@ is_end = false;
 goal_torl = 0.5;
 max_iter = 1000;
 
-dist = 0.5;
+dist = 1;
 
 %% Place Random Node
 
@@ -26,28 +26,63 @@ hold on
 while(~is_end)
     q_rand = [rand_btw(-0.2*size(map,2), 1.2*size(map,2)) rand_btw(-0.2*size(map,1), 1.2*size(map,1))]; % New Random Node
     q_near = V(find_nearest(q_rand,V),:)
-    q_new = points_on_line(q_near, q_rand, dist)
+    q_new = points_on_line(q_near, q_rand, dist);
     if ((1 < q_new(2)) & (q_new(2)< size(map,1))) & ((1 < q_new(1))& (q_new < size(map,2)))
         if map(round(q_new(2)),round(q_new(1))) == 0
             V = [V; [q_new(1), q_new(2)]];
             E = [E; [find(V==q_near,1) size(V,1)]];
         end
-    end
-    p1 = plot(q_rand(1),q_rand(2),'r.','MarkerSize',15);
-    plot(V(:,1),V(:,2),'g.','MarkerSize',15);
-    p2 = plot(q_new(1),q_new(2),'b.','MarkerSize',15);
+            p1 = plot(q_rand(1),q_rand(2),'r.','MarkerSize',15);
+        plot(V(:,1),V(:,2),'g.','MarkerSize',15);
+        p2 = plot(q_new(1),q_new(2),'b.','MarkerSize',15);
 
-    plot([V(E(end,1),1),V(E(end,2),1)],[V(E(end,1),2),V(E(end,2),2)],'g','MarkerSize',15);
+        plot([V(E(end,1),1),V(E(end,2),1)],[V(E(end,1),2),V(E(end,2),2)],'g','MarkerSize',15);
 
-    pause(0.0001)
-    delete(p1)
-    delete(p2)
-    if norm(conf_goal - q_new)< goal_torl
-        is_end = true;
+        pause(0.0001)
+        delete(p1)
+        delete(p2)
+        if norm(conf_goal - q_new)< goal_torl
+            is_end = true;
+        end
     end
 end
 
+
 toc
+
+%% test
+
+
+%%
+while_end = false;
+old_E = E;
+while (~while_end)
+    new_E = remove_endpoint(old_E,V);
+    disp(size(old_E));
+    disp(size(new_E));
+    if size(old_E,1) == size(new_E,1)
+        while_end = true;
+    else
+        old_E = new_E;
+    end
+    
+end
+
+
+%%
+figure;
+imshow(disp_map,'InitialMagnification','fit')
+hold on
+plot(V(:,1),V(:,2),'g.','MarkerSize',15);
+for i = 1:size(new_E,1)
+    j = new_E(i,:)
+    plot([V(j(1),1),V(j(2),1)],[V(j(1),2),V(j(2),2)],'r','MarkerSize',15);
+end
+
+
+
+
+%%
 
 
 
@@ -63,7 +98,7 @@ function q_new = points_on_line(q_start, q_end, dist)
     syms x y
     f = (x-q_start(1))^2 + (y-q_start(2))^2 - dist^2;
     g = (y-q_start(2)) -(x-q_start(1))*(q_start(2)-q_end(2))/(q_start(1)-q_end(1));
-    [solu, solv] = solve(f,g)
+    [solu, solv] = solve(f,g);
     solu = eval(solu);
     solv = eval(solv);
     if ((q_start(1) < solu(1)) && (q_end(1) > solu(1))) || ((q_end(1) < solu(1)) && (q_start(1) > solu(1)))
@@ -76,4 +111,33 @@ end
 function rand_num = rand_btw(a,b)
     rand_num = a + (b-a)*rand();
 end
+
+function new_E= remove_endpoint(E,V)
+    new_E = E;
+    V_index = 1:size(V,1);
+    end_E_index = [];
+    for i=V_index(2:size(V,1)-1)
+        [row, col] = find(E==i);
+        size(row,1)
+        if size(row,1) == 1
+            end_E_index = [end_E_index; row];
+        end
+    end
+    
+    new_E(end_E_index,:) = [];
+end
+
+
+
+%{
+
+function path = dubins(conf_i, conf_f);
+    mid_point = (conf_i(1:2)+conf_f(1:2))/2;
+    vector_m = [-1*mid_point(2) mid_point(1)] %% vector passes mid_point and Center
+    vector_i = [-1*conf_i(2) conf_i(1)] %% vector passes inital_point and Center
+    syms t1 t2;
+    eq1 = conf_i(1)+t1*
+    
+end
+%}
 
