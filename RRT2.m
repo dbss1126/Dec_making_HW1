@@ -12,7 +12,7 @@ goal_torl = 0.5;
 max_iter = 1000;
 
 dist = 1;
-step = 0.2;
+step = 0.4;
 rot_angle = pi()-2*atan2(1,step/2);
 
 %% Place Random Node
@@ -25,12 +25,26 @@ imshow(disp_map,'InitialMagnification','fit')
 hold on
 
 V = [V; [conf_init(1)+step, conf_init(2)]];
-E = [E; [1, 2]];  
+E = [E; [1, 2]];
 
 while(~is_end)
     q_rand = [rand_btw(-0.2*size(map,2), 1.2*size(map,2)) rand_btw(-0.2*size(map,1), 1.2*size(map,1))]; % New Random Node
-    q_near = V(find_nearest(q_rand,V),:);
+    i = find_nearest(q_rand,V);
+    if(size(i) ~= 1)
+        disp("ERROR")
+        break
+    end
+
+    q_near = V(i(1),:);
+
+    
+
     [q_near_i, col] = find(V==q_near,1);
+    if(size(q_near_i,1) ~= 1)
+        disp("ERROR")
+        break
+    end
+
 
     [connected_i, col2] = find(E==q_near_i,1,'last');
     connected_i = E(connected_i,1);
@@ -51,9 +65,10 @@ while(~is_end)
     vec_next = vec_next';
     q_new = q_near + vec_next;
 
-    is_in_V = V==q_new;
-    if sum(is_in_V,'all') == 0
-
+    Lia = ismember(q_new,V,'rows');
+    
+    if (Lia == 0) && (size(Lia,1) == 1) && (norm(vec_next)<double(step+0.001))
+    
         %q_new = points_on_line(q_near, q_rand, dist);
         if ((1 < q_new(2)) & (q_new(2)< size(map,1))) & ((1 < q_new(1))& (q_new < size(map,2)))
             if map(round(q_new(2)),round(q_new(1))) == 0
@@ -63,9 +78,9 @@ while(~is_end)
             p1 = plot(q_near(1),q_near(2),'r.','MarkerSize',25);
             plot(V(:,1),V(:,2),'g.','MarkerSize',15);
             p2 = plot(q_new(1),q_new(2),'b.','MarkerSize',25);
-    
+        
             plot([V(E(end,1),1),V(E(end,2),1)],[V(E(end,1),2),V(E(end,2),2)],'g','MarkerSize',15);
-    
+        
             pause(0.001)
             delete(p1)
             delete(p2)
