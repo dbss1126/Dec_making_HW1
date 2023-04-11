@@ -12,6 +12,8 @@ goal_torl = 0.5;
 max_iter = 1000;
 
 dist = 1;
+step = 0.2;
+rot_angle = pi()-2*atan2(1,step/2);
 
 %% Place Random Node
 
@@ -22,27 +24,54 @@ disp_map(conf_init(2),conf_init(1),:) = [255,0,0];
 imshow(disp_map,'InitialMagnification','fit')
 hold on
 
+V = [V; [conf_init(1)+step, conf_init(2)]];
+E = [E; [1, 2]];  
 
 while(~is_end)
     q_rand = [rand_btw(-0.2*size(map,2), 1.2*size(map,2)) rand_btw(-0.2*size(map,1), 1.2*size(map,1))]; % New Random Node
-    q_near = V(find_nearest(q_rand,V),:)
-    q_new = points_on_line(q_near, q_rand, dist);
-    if ((1 < q_new(2)) & (q_new(2)< size(map,1))) & ((1 < q_new(1))& (q_new < size(map,2)))
-        if map(round(q_new(2)),round(q_new(1))) == 0
-            V = [V; [q_new(1), q_new(2)]];
-            E = [E; [find(V==q_near,1) size(V,1)]];
-        end
-            p1 = plot(q_rand(1),q_rand(2),'r.','MarkerSize',15);
-        plot(V(:,1),V(:,2),'g.','MarkerSize',15);
-        p2 = plot(q_new(1),q_new(2),'b.','MarkerSize',15);
+    q_near = V(find_nearest(q_rand,V),:);
+    [q_near_i, col] = find(V==q_near,1);
 
-        plot([V(E(end,1),1),V(E(end,2),1)],[V(E(end,1),2),V(E(end,2),2)],'g','MarkerSize',15);
+    [connected_i, col2] = find(E==q_near_i,1,'last');
+    connected_i = E(connected_i,1);
+    connected = V(connected_i,:);
 
-        pause(0.0001)
-        delete(p1)
-        delete(p2)
-        if norm(conf_goal - q_new)< goal_torl
-            is_end = true;
+    vec_cur = q_near-connected;
+    
+    
+    if rand()>0.5
+        dir = 1;
+    else
+        dir = -1;
+    end
+    
+    rot = [cos(dir*rot_angle) -1*sin(dir*rot_angle); sin(dir*rot_angle) cos(dir*rot_angle)];
+
+    vec_next = rot*vec_cur';
+    vec_next = vec_next';
+    q_new = q_near + vec_next;
+
+    is_in_V = V==q_new;
+    if sum(is_in_V,'all') == 0
+
+        %q_new = points_on_line(q_near, q_rand, dist);
+        if ((1 < q_new(2)) & (q_new(2)< size(map,1))) & ((1 < q_new(1))& (q_new < size(map,2)))
+            if map(round(q_new(2)),round(q_new(1))) == 0
+                V = [V; [q_new(1), q_new(2)]];
+                E = [E; [find(V==q_near,1) size(V,1)]];
+            end
+            p1 = plot(q_near(1),q_near(2),'r.','MarkerSize',25);
+            plot(V(:,1),V(:,2),'g.','MarkerSize',15);
+            p2 = plot(q_new(1),q_new(2),'b.','MarkerSize',25);
+    
+            plot([V(E(end,1),1),V(E(end,2),1)],[V(E(end,1),2),V(E(end,2),2)],'g','MarkerSize',15);
+    
+            pause(0.001)
+            delete(p1)
+            delete(p2)
+            if norm(conf_goal - q_new)< goal_torl
+                is_end = true;
+            end
         end
     end
 end
@@ -84,6 +113,8 @@ end
 
 %%
 
+
+%function choose_next()
 
 
 function nearest_index = find_nearest(q, V)
