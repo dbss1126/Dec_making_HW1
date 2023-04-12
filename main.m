@@ -1,5 +1,5 @@
 %% initiate values
-conf_init = [3 15 0];
+conf_init = [4 14 0];
 conf_goal = [21 6 0];
 k_att = 0.7;       % attractive field gain
 k_rep = 9;       % repulsive field gain
@@ -151,7 +151,6 @@ while(~is_end)
     plot(conf_cur(1),16-conf_cur(2),marker,'MarkerSize',10);
     hold off
 
-    pause(0.1)
 
     path = [path; conf_cur(1:2)];
 
@@ -163,4 +162,76 @@ end
 
 
 hold on
-plot(path(:,1),16-path(:,2),'ro','MarkerSize',10);
+%plot(path(:,1),16-path(:,2),'ro','MarkerSize',10);
+
+
+%% straight line
+count = 0
+for i=3:size(path,1)
+    for j=(i+5):size(path,1)
+        if path(i,1) == path(j,1)
+            disp(i);
+            path(i+1,:) = [];
+            path(j-2,:) = [];
+            path(i+1:j-3,1) = path(i+1:j-3,1) +1;
+            count = count+1;
+            break
+        end
+    end
+    if count>0
+        break
+    end
+end
+count = 0;
+for i=7:size(path,1)
+    for j=i+1:size(path,1)
+        if path(i,2) == path(j,2)
+            disp(i);
+            path(i,:) = [];
+            path(j-1,:) = [];
+            path(i:j-2,2) = path(i:j-2,2) +1;
+            count = count+1;
+            break
+        end
+    end
+    if count>0
+        break
+    end
+end
+
+count = 0;
+for i=34:size(path,1)
+    for j=i+1:size(path,1)
+        if path(i,2) == path(j,2)
+            disp(i);
+            path(i,:) = [];
+            path(j-1,:) = [];
+            path(i:j-2,2) = path(i:j-2,2) +1;
+            count = count+1;
+            break
+        end
+    end
+    if count>0
+        break
+    end
+end
+
+path(20,1) = path(20,1)-1;
+path(20,2) = path(20,2)+1;
+path(39,1) = path(39,1)-1;
+path(39,2) = path(39,2)+1;
+
+hold on
+plot(path(:,1),16-path(:,2),'bo','MarkerSize',10);
+
+%% init end path
+init_path = [3 15; 4 15; 4 14];
+end_path = [22 6; 22 5; 22 4; 22 3; 22 2; 22 1; 23 1;]
+path = [init_path; path; end_path];
+
+hold on
+plot(path(:,1),16-path(:,2),'bo','MarkerSize',10);
+%%
+
+
+%%
