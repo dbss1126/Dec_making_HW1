@@ -39,6 +39,7 @@ i = i+1;
 while(~is_end)
     u1(i) = 2;
     theta0(i) = theta0(i-1) + u1(i)*tand(phi(i))*step_t/L;
+    theta1(i) = theta1(i-1) + u1(i)*sin(theta0(i-1)-theta1(i-1))*step_t/d1;
     x(i) = x(i-1) + u1(i)*cos(theta0(i))*step_t;
     y(i) = y(i-1) + u1(i)*sin(theta0(i))*step_t;
     if x(i) > 7.999
@@ -48,6 +49,7 @@ while(~is_end)
     end
 end
 theta0(i:end) = theta0(i);
+theta1(i:end) = theta1(i);
 x(i:end) = x(i);
 y(i:end) = y(i);
 
@@ -73,6 +75,7 @@ is_end = false;
 while(~is_end)
     u1(i) = 1;
     theta0(i) = theta0(i-1) + u1(i)*tand(phi(i))*step_t/L;
+    theta1(i) = theta1(i-1) + u1(i)*sin(theta0(i-1)-theta1(i-1))*step_t/d1;
     x(i) = x(i-1) + u1(i)*cos(theta0(i))*step_t;
     y(i) = y(i-1) + u1(i)*sin(theta0(i))*step_t;
     if x(i) > 9.9989
@@ -85,6 +88,7 @@ end
 x(i:end) = x(i);
 y(i:end) = y(i);
 theta0(i:end) = theta0(i);
+theta1(i:end) = theta1(i);
 
 %% 5. steering
 is_end = false;
@@ -108,6 +112,7 @@ is_end = false;
 while(~is_end)
     u1(i) = 10;
     theta0(i) = theta0(i-1) + u1(i)*tand(phi(i))*step_t/L;
+    theta1(i) = theta1(i-1) + u1(i)*sin(theta0(i-1)-theta1(i-1))*step_t/d1;
     x(i) = x(i-1) + u1(i)*cos(theta0(i))*step_t;
     y(i) = y(i-1) + u1(i)*sin(theta0(i))*step_t;
     if y(i) > 0
@@ -116,5 +121,35 @@ while(~is_end)
         i=i+1;
     end
 end
+x(i+1:end) = [];
+y(i+1:end) = [];
+theta0(i+1:end) = [];
+theta1(i+1:end) = [];
+u1(i+1:end) = [];
+u2(i+1:end) = [];
+phi(i+1:end) = [];
 
+
+%% Plot result
+figure();
+subplot(3,3,1);
+plot(u1);
+hold on
+plot(u2);
+legend('u1','u2');
+hold off
+
+subplot(3,3,4);
+plot(theta0);
+hold on
+plot(theta1);
+legend('theta0','theta1');
+hold off
+
+subplot(3,3,7);
+plot(phi);
+legend('phi');
+
+subplot(3,3,[2,3,5,6,8,9]);
 plot(x,y);
+legend('pos');
