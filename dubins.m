@@ -1,9 +1,9 @@
-ban = ["LRL","LSR","LSL"];
+ban = ["RSL","RSR","RLR"];
 
 
 dubConnObj = dubinsConnection('MinTurningRadius',1, "DisabledPathTypes",ban);
-startPose = [0 0 0];
-goalPose = [10 10 0];
+startPose = [rand()*10 rand()*10 rand()*10*pi()];
+goalPose = [rand()*10 rand()*10 rand()*10*pi()];
 
 [pathSegObj, pathCosts] = connect(dubConnObj,startPose,goalPose);
 show(pathSegObj{1})
